@@ -23,15 +23,15 @@ import { postIncomeExpense, putInvoice } from "@/services/incomeExpenseService";
 interface AddClientProps {
   setCount: React.Dispatch<React.SetStateAction<number>>;
   type: "add" | "view" | "update";
-  id:'',
-  company_id: 0,
-  customer_id:'',
-  pay_for:'',
-  credit_amount:'',
-  debit_amount:'',
-  payment_type:'',
-  payment_date:'',
-  additional_note:''
+  id?:string,
+  company_id?: number,
+  customer_id?:string,
+  pay_for?:string,
+  credit_amount?:string,
+  debit_amount?:string,
+  payment_type?:string,
+  payment_date?:string,
+  additional_note?:string
 }
 
 export const CashReceipt: React.FC<AddClientProps> = ({

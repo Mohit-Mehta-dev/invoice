@@ -1,7 +1,7 @@
 import { addToast, Button, Image, Input, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 import React, { useState, useEffect, useCallback } from "react";
 import { EditIcon } from "../icons/table/edit-icon";
-import { Client, Invoice, InvoiceFormType, InvoiceItem, User, UserSettings } from "@/helpers/types";
+import { Client, Invoice, InvoiceFormType, InvoiceItem, ReceiptFormType, User, UserSettings } from "@/helpers/types";
 import { getClientById, getClients } from "@/services/clientService";
 import { getAuthFromLocalStorage } from "@/utils/localStorageUtils";
 import moment, { max } from "moment";
@@ -53,7 +53,7 @@ export const PrintCashReceipt: React.FC<AddInvoiceProps> = ({ type }) => {
   const [paymentDate, setPaymentDate] = useState<string>("");
   const [selectedPaymentItem, setSelectedPaymentItem] = useState<InvoiceItem>()
 
-  const [ReceiptData, setReceiptData] = useState({})
+  const [ReceiptData, setReceiptData] = useState<ReceiptFormType>()
 
 
   // Modify the initial state to have 6 rows (3 additional ones)
@@ -74,13 +74,8 @@ export const PrintCashReceipt: React.FC<AddInvoiceProps> = ({ type }) => {
       fetchSettings(user.id);
 
       if(type==="add"){
-        // fetchClient(Number(id));
-        // fetchInvoiceNumber(user.id);
-        // fetchReceiptById(Number(id));
-        // fetchIncomeExpenseByInv(Number(id))
       }else {
         fetchReceiptById(Number(id));
-        // fetchIncomeExpense(Number(id))
       }
     }
   }, [user]);
@@ -111,45 +106,11 @@ export const PrintCashReceipt: React.FC<AddInvoiceProps> = ({ type }) => {
       setReceiptData(response);
       
       setSelectedClient(response?.customer);
-    //   setInvoiceData(response);
-    //   const inv_items = response.items.map((item:InvoiceItem) => {
-    //     return {
-    //         ...item,
-    //         name: item.item,
-    //         qty: item.quantity,
-    //     };
-    // });     
-    //   setInvoiceNumber(response.inv_number);
-    //   setGst(response.inv_gst_amount);
-    //   setGstType(response.inv_gst_type)
-    //   setDiscount(response.inv_discount_amount)
-    //   setDiscountType(response.inv_discount_type)
-    //   setInvoiceItems(inv_items);
-    //   setSelectedClient(response.customer)
     } catch (err) {
       console.error("Error fetching clients:", err);
     }
   }, []);
 
-  // const fetchIncomeExpense = useCallback(async (id: number) => {
-  //   try {
-  //     let response = await getIncomeExpenseById(id);
-  //     console.log('invoice data',response)
-  //     setInvoiceData(response);
-  //     // setSelectedClient(response);
-  //     const inv_items = response.items.map(item => {
-  //       return {
-  //           ...item,
-  //           name: item.item,
-  //           qty: item.quantity,
-  //       };
-  //   });     
-  //     setInvoiceNumber(response.inv_number);
-  //     setInvoiceItems(inv_items);
-  //   } catch (err) {
-  //     console.error("Error fetching clients:", err);
-  //   }
-  // }, []);
 
   const fetchInvoiceNumber = useCallback(async (id: number) => {
     try {
@@ -181,21 +142,6 @@ export const PrintCashReceipt: React.FC<AddInvoiceProps> = ({ type }) => {
     return newErrors;
   };
 
-  // const handleAddItem = (itemName: string, quantity: number, price: number) => {
-  //   const itemErrors = validateItem(itemName, quantity, price);
-  //   setErrors((prevErrors) => [...prevErrors, ...itemErrors]);
-  //   if (itemErrors.length === 0) {
-  //     const newItem = { name: itemName, qty: quantity, price: price };
-  //     setInvoiceItems((prevItems) => [...prevItems, newItem]);
-  //   }
-  // };
-
-  // const handleAddItem = () => {
-  //   setInvoiceItems((prevItems) => [
-  //     ...prevItems,
-  //     { name: "", qty: null, price: null },
-  //   ]);
-  // };
 
   const handleDeleteItem = (index: number) => {
     const updatedItems = invoiceItems.filter((_, idx) => idx !== index);
@@ -227,11 +173,6 @@ export const PrintCashReceipt: React.FC<AddInvoiceProps> = ({ type }) => {
 
   const handleInvoiceSubmit = useCallback(async() => {
     const newErrors = validateFormOnSubmit();
-    // invoiceItems.forEach((item, index) => {
-    //   // if (!item.name.trim()) {
-    //   //   newErrors.push(`Item ${index + 1} name cannot be empty.`);
-    //   // }
-    // });
     if (newErrors.length > 0) {
       setErrors(newErrors);
       newErrors.forEach((error) => {
@@ -249,24 +190,6 @@ export const PrintCashReceipt: React.FC<AddInvoiceProps> = ({ type }) => {
       return;
     }
 
-  //   const filteredInvoiceItems = invoiceItems.filter(item => item.name !== "");
-  //   const inv_items_to_submit = filteredInvoiceItems.map(item => {
-  //     console.log('inc item',item )
-  //     const newItem = {
-  //         ...item,
-  //         pay_to: selectedClient?.company_name,
-  //         pay_for: item.item,
-  //         inv_id:item.inv_id,
-  //         inv_item_id:item.id,
-  //         payment_type: item.paymentType,
-  //         credit_amount: item.price,
-  //         payment_date: item.date,
-  //     };
-  //     delete newItem.name;
-  //     delete newItem.qty;
-  
-  // return newItem;
-  // });  
     const formData: InvoiceFormType = {
 
       company_id: user?.id,
@@ -542,20 +465,6 @@ const clearPaymentFields = () =>{
   setPaymentDate('');
 };
 
-const handleDeletePaymentItem = (index: number) => {
-  const updatedItems = paymentDataList.filter((_, idx) => idx !== index);
-  setPaymentDataList(updatedItems);
-};
-
-const handleEditPaymentItem = (record) => {
-  {console.log('edit record',record)}
-  setPaymentItem(record.item);
-  setPaymentType(record.paymentType);
-  setPaymentPrice(record.amount);
-  setPaymentDate(record.date);
-  setSelectedPaymentItem(record); // Store the record being edited
-};
-
 
 const addOrUpdatePaymentData = () => {
   if (!paymentItem || !paymentType || !paymentPrice || !paymentDate) {
@@ -617,73 +526,6 @@ useEffect(() => {
 }, [paymentDataList, previousPaymentDataList]);
 
 
-const fetchIncomeExpenseByInv = useCallback(async (id: number) => {
-      try {
-        let response = await getIncomeExpenseByInvId(id);
-        console.log("response", response);
-        // setIncomeExpenseList(response.reverse());
-        // setIncomeExpenseList(response.reverse());
-        if (response?.data) {
-          // Add new payments to the current state
-          setPreviousPaymentDataList(prevPaymentDataList => [
-            ...prevPaymentDataList, 
-            ...response.data // Assuming response.data is an array of payment data
-          ]);
-        }
-      } catch (err: unknown) {
-        console.log("Data error:", err);
-  
-        if (err instanceof AxiosError) {
-          const status = err.response?.status;
-  
-          switch (status) {
-            case 400:
-              addToast({
-                title: "Bad Request",
-                description: "Please check your input and try again.",
-                color: "danger",
-              });
-              break;
-            case 401:
-              addToast({
-                title: "Unauthorized",
-                description: "Invalid credentials. Please try again.",
-                color: "danger",
-              });
-              break;
-            case 404:
-              addToast({
-                title: "No data",
-                description: "No Income / Expense found.",
-                color: "success",
-              });
-              break;
-            case 500:
-              addToast({
-                title: "Server Error",
-                description: "An error occurred on the server. Please try again later.",
-                color: "danger",
-              });
-              break;
-            default:
-              addToast({
-                title: "Error",
-                description: "An unexpected error occurred. Please try again.",
-                color: "danger",
-              });
-              break;
-          }
-        } else {
-          addToast({
-            title: "Unexpected Error",
-            description: "An unexpected error occurred. Please try again.",
-            color: "danger",
-          });
-        }
-      }
-    }, [addToast]);
-
-
   
   return (
     <div className="mt-4">
@@ -728,7 +570,7 @@ const fetchIncomeExpenseByInv = useCallback(async (id: number) => {
               </div>
             </div> */}
             <h1 className="text-xl font-bold" style={{ color: userSettings?.inv_secondary_color }}>
-              Date: {moment(ReceiptData.ReceiptDate).format('DD-MM-YYYY')}
+              Date: {moment(ReceiptData.payment_date).format('DD-MM-YYYY')}
             </h1>
           </div>
         </div>
@@ -817,7 +659,7 @@ const fetchIncomeExpenseByInv = useCallback(async (id: number) => {
                 {ReceiptData.credit_amount !="0.00" ?ReceiptData.credit_amount:ReceiptData.debit_amount}
               </TableCell>
               <TableCell>
-                {moment(ReceiptData.ReceiptDate).format('DD-MM-YYYY')}
+                {moment(ReceiptData.payment_date).format('DD-MM-YYYY')}
               </TableCell>
             </TableRow>
           {/* ))} */}
