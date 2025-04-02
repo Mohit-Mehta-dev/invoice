@@ -114,7 +114,7 @@ const fetchDashboard = useCallback(async (id: number) => {
       <div className="mt-6 gap-6 flex flex-col w-full">
         {/* Card Section Top */}
         <div className="flex flex-col gap-2">
-          <h3 className="text-xl font-semibold">Available Balance</h3>
+          <h3 className="text-xl font-semibold">Dashboard</h3>
           <div className="grid md:grid-cols-2 grid-cols-1 2xl:grid-cols-3 gap-5  justify-center w-full">
             <CardCounter text={'customer'} value={dashboardData?.totalCustomers??0} />
             <CardCounter text={'Total Amount'} value={dashboardData?.totalInvoiceValue??0} />
