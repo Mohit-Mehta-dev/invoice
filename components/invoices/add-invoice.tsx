@@ -623,6 +623,29 @@ const generatePDF = async () => {
   const signature = await fetchImageAsBase64(`${process.env.NEXT_PUBLIC_BASE_URL}${userSettings?.signature_image}`)
   const qr = await fetchImageAsBase64(`${process.env.NEXT_PUBLIC_BASE_URL}${userSettings?.qr_code}`)
   const docDefinition = {
+    watermark: { text: user?.company_name, color:userSettings?.inv_secondary_color, opacity: 0.05, bold: true, italics: false },
+    background: function(currentPage, pageSize) { 
+      return{canvas: [
+        {
+          type: 'rect', 
+          x: 0, 
+          y: 0, 
+          w: pageSize.width, 
+          h: 150, 
+          r: 0, 
+          color: userSettings?.inv_primary_color
+        },
+        {
+          type: 'rect', 
+          x: 0, 
+          y: pageSize.height-70, 
+          w: pageSize.width, 
+          h: 70, 
+          r: 0, 
+          color: userSettings?.inv_primary_color
+        },
+      ]}
+    },
     content: [
       {
         stack: [
@@ -632,6 +655,7 @@ const generatePDF = async () => {
                 image: logo,
                 width: 100,
                 height: 100,
+                margin:[0, 0, 0, 40]
               },
               {
                 stack:[
@@ -815,8 +839,8 @@ const generatePDF = async () => {
         text: `Thank you for choosing ${user?.company_name} for your business.`,
         style: 'thankYouText',
         alignment: 'center',
-        margin: [0, 0, 0, 20],
-        absolutePosition: { x: 0, y: 750 },
+        margin: [0, 0, 0, 0],
+        absolutePosition: { x: 0, y: 780 },
         color:userSettings?.inv_secondary_color
       },
     ],
