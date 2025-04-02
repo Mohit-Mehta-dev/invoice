@@ -25,7 +25,7 @@ export const NavbarWrapper = ({ children }: Props) => {
         <NavbarContent className="md:hidden">
           <BurguerButton />
         </NavbarContent>
-        <NavbarContent className="w-full max-md:hidden">
+        {/* <NavbarContent className="w-full max-md:hidden">
           <Input
             startContent={<SearchIcon />}
             isClearable
@@ -36,28 +36,28 @@ export const NavbarWrapper = ({ children }: Props) => {
             }}
             placeholder="Search..."
           />
-        </NavbarContent>
+        </NavbarContent> */}
         <NavbarContent
           justify="end"
           className="w-fit data-[justify=end]:flex-grow-0"
         >
-          <div className="flex items-center gap-2 max-md:hidden">
+          {/* <div className="flex items-center gap-2 max-md:hidden">
             <FeedbackIcon />
             <span>Feedback?</span>
-          </div>
+          </div> */}
 
-          <NotificationsDropdown />
+          {/* <NotificationsDropdown /> */}
 
-          <div className="max-md:hidden">
+          {/* <div className="max-md:hidden">
             <SupportIcon />
-          </div>
+          </div> */}
 
-          <Link
+          {/* <Link
             href="https://github.com/Siumauricio/nextui-dashboard-template"
             target={"_blank"}
           >
             <GithubIcon />
-          </Link>
+          </Link> */}
           <NavbarContent>
             <UserDropdown />
           </NavbarContent>

@@ -35,14 +35,14 @@ export const UserDropdown = () => {
       <DropdownMenu
         aria-label='User menu actions'
         onAction={(actionKey) => console.log({ actionKey })}>
-        <DropdownItem
+        {/* <DropdownItem
           key='profile'
           className='flex flex-col justify-start w-full items-start'>
           <p>Signed in as</p>
           <p>Mohit@rtg.com</p>
         </DropdownItem>
         <DropdownItem key='settings'>My Settings</DropdownItem>
-        <DropdownItem key='help_and_feedback'>Help & Feedback</DropdownItem>
+        <DropdownItem key='help_and_feedback'>Help & Feedback</DropdownItem> */}
         <DropdownItem
           key='logout'
           color='danger'
