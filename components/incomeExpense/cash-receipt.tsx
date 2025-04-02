@@ -7,65 +7,63 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Select,
+  SelectItem,
   useDisclosure,
 } from "@heroui/react";
 import { EditIcon } from "../icons/table/edit-icon";
 import { Formik } from "formik";
-import { ClientFormType, User } from "@/helpers/types";
-import { ClientSchema } from "@/helpers/schemas";
+import { Client, ClientFormType, ReceiptFormType, User } from "@/helpers/types";
+import { ClientSchema, ReceiptSchema } from "@/helpers/schemas";
 import { EyeIcon } from "../icons/table/eye-icon";
-import { postClients, putClients } from "@/services/clientService";
+import { getClientById, getClients, postClients, putClients } from "@/services/clientService";
 import { getAuthFromLocalStorage } from "@/utils/localStorageUtils";
+import { postIncomeExpense, putInvoice } from "@/services/incomeExpenseService";
 
 interface AddClientProps {
   setCount: React.Dispatch<React.SetStateAction<number>>;
   type: "add" | "view" | "update";
-  id?:number,
-  first_name?: string;
-  last_name?: string;
-  company_name?: string;
-  phone?: string;
-  email?: string;
-  address_line_1?: string;
-  address_line_2?: string;
-  city?: string;
-  state?: string;
-  pincode?: string;
-  gstin?: string;
+  id:'',
+  company_id: 0,
+  customer_id:'',
+  pay_for:'',
+  credit_amount:'',
+  debit_amount:'',
+  payment_type:'',
+  payment_date:'',
+  additional_note:''
 }
 
 export const CashReceipt: React.FC<AddClientProps> = ({
   setCount,
   id,
   type,
-  first_name = "",
-  last_name = "",
-  company_name = "",
-  phone = "",
-  email = "",
-  address_line_1 = "",
-  address_line_2 = "",
-  city = "",
-  state = "",
-  pincode = "",
-  gstin = "",
+  company_id,
+  customer_id,
+  pay_for,
+  credit_amount,
+  debit_amount,
+  payment_type,
+  payment_date,
+  additional_note,
 }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();  // Destructure onOpen and onClose
 
   const [user, setUser] = useState<User | null>(null);
+  const [clientList, setClientList] = useState([]);
+  const [selectedClient, setSelectedClient] = useState<number>();
+  const [receiptType, setReceiptType] = useState<string>('expense');
+  const [paymentMode, setPaymentMode] = useState<string>('cash');
   // Initial values for the form
-  const [initialValues, setInitialValues] = useState<ClientFormType>({
-    firstName: "",
-    lastName: "",
-    companyName: "",
-    phoneNumber: "",
-    email: "",
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    pincode: "",
-    gstNumber: "",
+  const [initialValues, setInitialValues] = useState<ReceiptFormType>({
+    company_id: 0,
+    customer_id:'',
+    pay_for:'',
+    credit_amount:'',
+    debit_amount:'',
+    payment_type:'',
+    payment_date:'',
+    additional_note:''
   });
 
   useEffect(() => {
@@ -73,62 +71,54 @@ export const CashReceipt: React.FC<AddClientProps> = ({
     setUser(storedUser ? (storedUser as User) : null); // Safely set user
   }, []);
 
-
   useEffect(() => {
-    // Update initial values if props change (for the 'update' type)
-    setInitialValues({
-      firstName: first_name,
-      lastName: last_name,
-      companyName: company_name,
-      phoneNumber: phone,
-      email: email,
-      addressLine1: address_line_1,
-      addressLine2: address_line_2,
-      city: city,
-      state: state,
-      pincode: pincode,
-      gstNumber: gstin,
-    });
-  }, [
-    first_name,
-    last_name,
-    company_name,
-    phone,
-    email,
-    address_line_1,
-    address_line_2,
-    city,
-    state,
-    pincode,
-    gstin,
-  ]);
+      if (user?.id) {
+  
+        if(type==="add" ){
+          fetchClients(user.id);
+        }else{
+          setInitialValues({
+            company_id: 0,
+            customer_id:'',
+            pay_for:pay_for,
+            credit_amount:credit_amount,
+            debit_amount:debit_amount,
+            payment_type:payment_type,
+            payment_date:payment_date,
+            additional_note:additional_note  
+          })
+          
+        }
+      }
+    }, [user]);
+
 
   // Handle client submission (add/update)
-  const handleClientSubmit = useCallback(
-    async (values: ClientFormType) => {
+  const handleReceiptSubmit = useCallback(
+    async (values: ReceiptFormType) => {
       console.log("Form data submitted:", values);
       if (!user?.id) {
         console.log("User ID is missing");
         return; // Or show an error message
       }
+
+      const payment_items = [{
+        pay_for:values.pay_for,
+        credit_amount:Number(values.credit_amount),
+        debit_amount:Number(values.debit_amount),
+        payment_type:paymentMode,
+        payment_date:values.payment_date,
+        additional_note:values.additional_note
+      }]
+
       const formData = {
         company_id:user.id,
-        first_name: values.firstName,
-        last_name: values.lastName,
-        username: values.firstName,
-        company_name: values.companyName,
-        phone: values.phoneNumber,
-        email: values.email,
-        address_line1: values.addressLine1,
-        address_line2: values.addressLine2,
-        city: values.city,
-        state: values.state,
-        pincode: values.pincode,
-        gstin: values.gstNumber,
+        customer_id:selectedClient,
+        items:payment_items
       };
       if (type === "add") {
         try {
-        let response = await postClients(formData);
+        let response = await postIncomeExpense(formData);
         console.log("response", response);
         onOpenChange();
         setCount(prev => prev+1)
@@ -138,7 +128,7 @@ export const CashReceipt: React.FC<AddClientProps> = ({
     }else if (type === "update") {
       console.log("id",id)
       try {
-        let response = await putClients(formData, Number(id));
+        let response = await putInvoice(formData, Number(id));
         console.log("put Client response", response);
         onOpenChange(); 
         setCount(prev => prev+1)
@@ -147,7 +137,7 @@ export const CashReceipt: React.FC<AddClientProps> = ({
       }
     }
     },
-    [onOpenChange]
+    [onOpenChange, setCount, selectedClient, id, type, user]
   );
 
   // const fetchClients = useCallback(async (id: number) => {
@@ -158,13 +148,22 @@ export const CashReceipt: React.FC<AddClientProps> = ({
   //     console.log("Adding Client error:", err);
   //   }, [addToast, setError]);
 
+  const fetchClients = useCallback(async (id: number) => {
+      try {
+        let response = await getClients(id);
+        setClientList(response);
+      } catch (err) {
+        console.error("Error fetching clients:", err);
+      }
+    }, []);
+
   return (
     <div>
       <>
       {
         type === "add" ? (
           <Button onPress={onOpen} color="primary">
-            Add Client
+            Add Receipt
           </Button>
         ) : type === "view" ? (
           <Button onPress={onOpen} variant="light" isIconOnly>
@@ -183,13 +182,13 @@ export const CashReceipt: React.FC<AddClientProps> = ({
             {(onClose) => (
               <>
                 <ModalHeader className="flex flex-col gap-1">
-                {type === "add" ? "Add Client" : type === "view" ? "Client Details" : "Update Client"}
+                {type === "add" ? "Add Receipt" : type === "view" ? "Client Details" : "Update Receipt"}
                 </ModalHeader>
                 <ModalBody className="overflow-y-auto max-h-96">
                   <Formik
                     initialValues={initialValues}
-                    validationSchema={ClientSchema}
-                    onSubmit={handleClientSubmit}
+                    // validationSchema={ReceiptSchema}
+                    onSubmit={handleReceiptSubmit}
                   >
                     {({
                       values,
@@ -199,133 +198,70 @@ export const CashReceipt: React.FC<AddClientProps> = ({
                       handleSubmit,
                     }) => (
                       <form onSubmit={handleSubmit}>
+                        <Select className="max-w-full" label="Select client" onChange={(e)=>setSelectedClient(Number(e.target.value))}>
+                          {clientList.map((client) => (
+                            <SelectItem key={client.id}>{client?.company_name?client?.company_name:client?.first_name}</SelectItem>
+                          ))}
+                        </Select>
                         <Input
                           variant="bordered"
-                          label="First Name"
-                          value={values.firstName}
-                          isInvalid={!!errors.firstName && !!touched.firstName}
-                          errorMessage={errors.firstName}
-                          onChange={handleChange("firstName")}
+                          label="Payment For"
+                          value={values.pay_for}
+                          isInvalid={!!errors.pay_for && !!touched.pay_for}
+                          errorMessage={errors.pay_for}
+                          onChange={handleChange("pay_for")}
                           className="mb-4"
                           readOnly={type==="view"}
                           max={40}
                         />
                         <Input
                           variant="bordered"
-                          label="Last Name"
-                          value={values.lastName}
-                          isInvalid={!!errors.lastName && !!touched.lastName}
-                          errorMessage={errors.lastName}
-                          onChange={handleChange("lastName")}
-                          className="mb-4"
-                          readOnly={type==="view"}
-                          max={40}
-                        />
-                        <Input
-                          variant="bordered"
-                          label="Company Name"
-                          value={values.companyName}
-                          isInvalid={!!errors.companyName && !!touched.companyName}
-                          errorMessage={errors.companyName}
-                          onChange={handleChange("companyName")}
+                          label="Amount"
+                          value={String(receiptType) === 'expense'?  values.credit_amount:values.debit_amount}
+                          isInvalid={String(receiptType) === 'expense'?  !!errors.credit_amount && !!touched.credit_amount:!!errors.debit_amount && !!touched.debit_amount}
+                          errorMessage={String(receiptType) === 'expense'?  errors.credit_amount:errors.debit_amount}
+                          onChange={String(receiptType) === 'expense'?  handleChange("credit_amount"):handleChange("debit_amount")}
                           className="mb-4"
                           readOnly={type==="view"}
                           max={50}
                         />
+                        <Select className="max-w-full" label="Receipt type" value={receiptType} onChange={(e)=>{console.log(e.target.value);setReceiptType(e.target.value)}}>
+                            <SelectItem key={'expense'}>Expense</SelectItem>
+                            <SelectItem key={'income'}>Income</SelectItem>
+                        </Select>
+                        <Select className="max-w-full" label="Payment Mode" value={paymentMode}  onChange={(e)=>setPaymentMode(e.target.value)}>
+                            <SelectItem key={'gpay'}>Gpay</SelectItem>
+                            <SelectItem key={'cash'}>Cash</SelectItem>
+                        </Select>
                         <Input
                           variant="bordered"
-                          label="Phone Number"
-                          value={values.phoneNumber}
-                          isInvalid={!!errors.phoneNumber && !!touched.phoneNumber}
-                          errorMessage={errors.phoneNumber}
-                          onChange={handleChange("phoneNumber")}
-                          className="mb-4"
-                          readOnly={type==="view"}
-                          max={10}
-                        />
-                        <Input
-                          variant="bordered"
-                          label="Email"
-                          value={values.email}
-                          isInvalid={!!errors.email && !!touched.email}
-                          errorMessage={errors.email}
-                          onChange={handleChange("email")}
-                          className="mb-4"
-                          readOnly={type==="view"}
-                          max={30}
-                        />
-                        <Input
-                          variant="bordered"
-                          label="Address Line 1"
-                          value={values.addressLine1}
-                          isInvalid={!!errors.addressLine1 && !!touched.addressLine1}
-                          errorMessage={errors.addressLine1}
-                          onChange={handleChange("addressLine1")}
+                          type="date"
+                          label="Date "
+                          value={values.payment_date}
+                          isInvalid={!!errors.payment_date && !!touched.payment_date}
+                          errorMessage={errors.payment_date}
+                          onChange={handleChange("payment_date")}
                           className="mb-4"
                           readOnly={type==="view"}
                           max={60}
                         />
                         <Input
                           variant="bordered"
-                          label="Address Line 2"
-                          value={values.addressLine2}
-                          isInvalid={!!errors.addressLine2 && !!touched.addressLine2}
-                          errorMessage={errors.addressLine2}
-                          onChange={handleChange("addressLine2")}
+                          label="Note "
+                          value={values.additional_note}
+                          isInvalid={!!errors.additional_note && !!touched.additional_note}
+                          errorMessage={errors.additional_note}
+                          onChange={handleChange("additional_note")}
                           className="mb-4"
                           readOnly={type==="view"}
                           max={60}
-                        />
-                        <Input
-                          variant="bordered"
-                          label="City"
-                          value={values.city}
-                          isInvalid={!!errors.city && !!touched.city}
-                          errorMessage={errors.city}
-                          onChange={handleChange("city")}
-                          className="mb-4"
-                          readOnly={type==="view"}
-                          max={30}
-                        />
-                        <Input
-                          variant="bordered"
-                          label="State"
-                          value={values.state}
-                          isInvalid={!!errors.state && !!touched.state}
-                          errorMessage={errors.state}
-                          onChange={handleChange("state")}
-                          className="mb-4"
-                          readOnly={type==="view"}
-                          max={30}
-                        />
-                        <Input
-                          variant="bordered"
-                          label="Pincode"
-                          value={values.pincode}
-                          isInvalid={!!errors.pincode && !!touched.pincode}
-                          errorMessage={errors.pincode}
-                          onChange={handleChange("pincode")}
-                          className="mb-4"
-                          readOnly={type==="view"}
-                          max={6}
-                        />
-                        <Input
-                          variant="bordered"
-                          label="GST Number"
-                          value={values.gstNumber}
-                          isInvalid={!!errors.gstNumber && !!touched.gstNumber}
-                          errorMessage={errors.gstNumber}
-                          onChange={handleChange("gstNumber")}
-                          className="mb-4"
-                          readOnly={type==="view"}
-                          max={18}
                         />
                         {type != "view" &&<ModalFooter>
                           <Button color="danger" variant="flat" onClick={onClose}>
                             Close
                           </Button>
                           <Button color="primary" type="submit">
-                            {type === "add" ? "Add Client" : "Update Client"}
+                            {type === "add" ? "Add Receipt" : "Update Receipt"}
                           </Button>
                         </ModalFooter>}
                       </form>

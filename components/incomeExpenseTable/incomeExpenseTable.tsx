@@ -17,7 +17,7 @@ import { getAuthFromLocalStorage } from "@/utils/localStorageUtils";
 import { deleteInvoice, getInvoices } from "@/services/invoiceService";
 import { getClients } from "@/services/clientService";
 import { RenderIncomeExpenseCell } from "./render-income-expense-cell";
-import { getIncomeExpense } from "@/services/incomeExpenseService";
+import { deleteIncomeExpense, getIncomeExpense } from "@/services/incomeExpenseService";
   
   export const IncomeExpenseTableWrapper = () => {
 
@@ -45,7 +45,7 @@ import { getIncomeExpense } from "@/services/incomeExpenseService";
         fetchInvoices(user.id);
         fetchIncomeExpense(user.id);
       }
-    }, [user, count]);  
+    }, [user, count,onOpenChange]);  
 
     const fetchClients = useCallback(async (id: number) => {
         try {
@@ -208,11 +208,11 @@ import { getIncomeExpense } from "@/services/incomeExpenseService";
           });
         }
       }
-    }, [addToast, setError]);
+    }, [addToast, setError, count, onOpenChange]);
 
-    const removeInvoice = useCallback(async (id: number) => {
+    const removeIncomeExpense = useCallback(async (id: number) => {
         try {
-          let response = await deleteInvoice(id);
+          let response = await deleteIncomeExpense(id);
           console.log("response", response);
           setCount(prev=>prev+1)
         } catch (err: unknown) {
@@ -292,7 +292,7 @@ import { getIncomeExpense } from "@/services/incomeExpenseService";
               <TableRow>
                 {(columnKey) => (
                   <TableCell>
-                    {RenderIncomeExpenseCell({ incomeExpense: item, columnKey: columnKey, setCount:setCount, deleteInvoice:removeInvoice })}
+                    {RenderIncomeExpenseCell({ incomeExpense: item, columnKey: columnKey, setCount:setCount, deleteInvoice:removeIncomeExpense })}
                   </TableCell>
                 )}
               </TableRow>

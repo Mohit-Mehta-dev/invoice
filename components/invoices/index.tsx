@@ -37,11 +37,11 @@ export const Invoices = () => {
         <li className="flex gap-2">
           <UsersIcon />
           <span>Invoices</span>
-          <span> / </span>{" "}
+          {/* <span> / </span>{" "} */}
         </li>
-        <li className="flex gap-2">
+        {/* <li className="flex gap-2">
           <span>List</span>
-        </li>
+        </li> */}
       </ul>
 
       <h3 className="text-xl font-semibold">All Invoices</h3>

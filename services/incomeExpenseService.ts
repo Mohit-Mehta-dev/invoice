@@ -52,7 +52,7 @@ export const getIncomeExpenseById = async (id:number) => {
     }
   };
   
-  export const putInvoice = async (data:AddInvoice, id:number) => {
+  export const putInvoice = async (data, id:number) => {
     if (!id) {
       throw new Error("id is required");  
     }
@@ -65,12 +65,12 @@ export const getIncomeExpenseById = async (id:number) => {
     }
   };
   
-  export const deleteInvoice = async (id:number) => {
+  export const deleteIncomeExpense = async (id:number) => {
     if (!id) {
       throw new Error("id is required");  
     }
     try {
-      const response = await axiosInstance.delete(`/invoices/${id}`);
+      const response = await axiosInstance.delete(`/invoicePayments/${id}`);
       return response.data;
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -78,3 +78,15 @@ export const getIncomeExpenseById = async (id:number) => {
     }
   };
   
+  export const getCashReceiptById = async (id:number) => {
+    if (!id) {
+      throw new Error("id is required");  
+    }
+      try {
+        const response = await axiosInstance.get(`/cashReceipt/${id}`);
+        return response.data;
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        throw error;
+      }
+    };

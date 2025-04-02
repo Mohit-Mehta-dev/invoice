@@ -6,6 +6,7 @@ import { EyeIcon } from "../icons/table/eye-icon";
 import { IncomeExpense, Invoice } from "@/helpers/types";
 import { useRouter } from "next/navigation";
 import moment from "moment";
+import { CashReceipt } from "../incomeExpense/cash-receipt";
 
 interface Props {
   setCount: React.Dispatch<React.SetStateAction<number>>;
@@ -90,19 +91,22 @@ export const RenderIncomeExpenseCell = ({ incomeExpense, columnKey, setCount, de
         <div className="flex items-center gap-4 ">
           <div>
             <Tooltip content="Details">
-              <button onClick={() => router.replace(`/income-expense/view/${incomeExpense?.id}`)}>
+              <button
+               onClick={() => router.replace(`/cash-receipt/view/${incomeExpense?.id}`)}
+               >
+                {/* <CashReceipt type="view" setCount={setCount}  /> */}
                 <EyeIcon size={20} fill="#979797" />
               </button>
             </Tooltip>
           </div>
-          <div>
+          {/* <div>
             <Tooltip content="Edit invoice" color="secondary">
-                <button onClick={() => router.replace(`/invoices/edit/${incomeExpense?.id}`)}>
+                <button onClick={() => router.replace(`/invoices/edit/${incomeExpense?.id}`)}> */}
                     {/* <AddInvoice type="update"/> */}
-                    <EditIcon size={20} fill="#979797" />
+                    {/* <EditIcon size={20} fill="#979797" />
                 </button>
             </Tooltip>
-          </div>
+          </div> */}
           <div>
             <Tooltip
               content="Delete user"

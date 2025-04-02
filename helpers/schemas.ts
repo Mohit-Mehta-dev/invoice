@@ -48,3 +48,12 @@ export const AddInvoiceSchema = object().shape({
     .min(1, "At least one item is required")
 })
 
+export const ReceiptSchema = object().shape({
+  customer_id: number().required("select customer"),
+  pay_for:string().required("Payment for is required"),
+  credit_amount:string().required("amount is required"),
+  debit_amount:string().required("amount is required"),
+  payment_type:string().required("payment Type is required"),
+  payment_date:string().required("payment date is required"),
+  additional_note:string().optional(),
+});

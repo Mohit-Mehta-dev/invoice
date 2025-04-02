@@ -9,7 +9,7 @@ import { DeleteIcon } from "../icons/table/delete-icon";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { AxiosError } from "axios";
-import { getSettings } from "@/services/authService";
+import { getImage, getSettings } from "@/services/authService";
 import { useParams, useRouter } from "next/navigation";
 import { BalanceIcon } from "../icons/sidebar/balance-icon";
 import { ExportIcon } from "../icons/accounts/export-icon";
@@ -307,6 +307,7 @@ export const AddInvoice: React.FC<AddInvoiceProps> = ({ type }) => {
       console.log('discontType',discountType)
       try {
         let response = await postInvoice(formData);
+        generatePDF();
         console.log("postInvoice response", response);
         router.push('/invoices');
         // setCount(prev => prev+1)
@@ -316,6 +317,7 @@ export const AddInvoice: React.FC<AddInvoiceProps> = ({ type }) => {
     } else if (type === "update") {
       try {
         let response = await putInvoice(formData, Number(id));
+        generatePDF();
         console.log("putInvoice response", response);
         router.push('/invoices');
         // setCount(prev => prev+1)
@@ -609,7 +611,8 @@ export const AddInvoice: React.FC<AddInvoiceProps> = ({ type }) => {
 // };
 
 const fetchImageAsBase64 = async (url) => {
-  const response = await fetch(url);
+  console.log(url)
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${url}`);
   const blob = await response.blob();
   const reader = new FileReader();
   return new Promise((resolve, reject) => {
@@ -619,9 +622,9 @@ const fetchImageAsBase64 = async (url) => {
   });
 };
 const generatePDF = async () => {
-  const logo = await fetchImageAsBase64(`${process.env.NEXT_PUBLIC_BASE_URL}${userSettings?.logo}`)
-  const signature = await fetchImageAsBase64(`${process.env.NEXT_PUBLIC_BASE_URL}${userSettings?.signature_image}`)
-  const qr = await fetchImageAsBase64(`${process.env.NEXT_PUBLIC_BASE_URL}${userSettings?.qr_code}`)
+  const logo = await fetchImageAsBase64(userSettings?.logo)
+  const signature = await fetchImageAsBase64(userSettings?.signature_image)
+  const qr = await fetchImageAsBase64(userSettings?.qr_code)
   const docDefinition = {
     watermark: { text: user?.company_name, color:userSettings?.inv_secondary_color, opacity: 0.05, bold: true, italics: false },
     background: function(currentPage, pageSize) { 
@@ -839,7 +842,7 @@ const generatePDF = async () => {
         text: `Thank you for choosing ${user?.company_name} for your business.`,
         style: 'thankYouText',
         alignment: 'center',
-        margin: [0, 0, 0, 0],
+        margin: [0, 0, 0, 20],
         absolutePosition: { x: 0, y: 780 },
         color:userSettings?.inv_secondary_color
       },
@@ -910,19 +913,19 @@ const generatePDF = async () => {
   return (
     <div className="mt-4">
       <div className="fixed bottom-20 right-10 z-50 rounded-xl">
-        <Button onPress={generatePDF} color="primary" className="mb-4 rounded-xl">
+        <Button onPress={generatePDF} color="primary" className="mb-8 rounded-xl">
           PDF
         </Button>
       </div>
       
       {type === "add"&&<div className="fixed bottom-10 right-10 z-50 rounded-xl">
         <Button onPress={handleInvoiceSubmit} color="primary" className="mb-4 rounded-xl">
-          <AccountsIcon  />
+          Save
         </Button>
       </div>}
       {type === "update"&&<div className="fixed bottom-10 right-10 z-50 rounded-xl">
         <Button onPress={handleInvoiceSubmit} color="primary" className="mb-4 rounded-xl">
-        Update Invoice
+        Update
         </Button>
       </div>}
 

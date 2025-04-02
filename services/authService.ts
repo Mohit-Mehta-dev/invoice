@@ -57,3 +57,13 @@ export const getProfile = async (id: number) => {
     throw error; // Handle the error appropriately in your component
   }
 };
+
+export const getImage = async (url: string) => {
+  try {
+    const response = await axiosInstance.get(`${url}`);
+    return response; // Returns the user data or token from the response
+  } catch (error) {
+    console.error("Image fetching failed:", error);
+    throw error; // Handle the error appropriately in your component
+  }
+};

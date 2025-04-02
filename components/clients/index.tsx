@@ -28,14 +28,14 @@ export const Clients = () => {
         <li className="flex gap-2">
           <UsersIcon />
           <span>Clients</span>
-          <span> / </span>{" "}
+          {/* <span> / </span>{" "} */}
         </li>
-        <li className="flex gap-2">
+        {/* <li className="flex gap-2">
           <span>List</span>
-        </li>
+        </li> */}
       </ul>
 
-      <h3 className="text-xl font-semibold">All Accounts</h3>
+      <h3 className="text-xl font-semibold">All Clients</h3>
       <div className="flex justify-between flex-wrap gap-4 items-center">
         <div className="flex items-center gap-3 flex-wrap md:flex-nowrap">
           <Input

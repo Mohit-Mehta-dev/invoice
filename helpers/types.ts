@@ -255,3 +255,14 @@ export type AddIncomeExpense = {
   customer_id: string;
   items:InvoiceFormItem[]
 };
+
+export type ReceiptFormType = {
+  company_id: number;
+  customer_id: string;
+  pay_for:string;
+  credit_amount:string | null;
+  debit_amount:string | null;
+  payment_type:string;
+  payment_date:string;
+  additional_note:string;
+};
