@@ -18,10 +18,9 @@ import { getAuthFromLocalStorage } from "@/utils/localStorageUtils";
 import { deleteInvoice, getInvoices } from "@/services/invoiceService";
 import { getClients } from "@/services/clientService";
 
-export const InvoiceTableWrapper = ({searchQuery, setSearchQuery}) => {
+export const InvoiceTableWrapper = ({searchQuery, setSearchQuery,count, setCount}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [user, setUser] = useState<User | null>(null);
-  const [count, setCount] = useState<number>(0);
   const [ClientsList, setClientsList] = useState<Invoice[]>([]);
   const [invoiceList, setInvoiceList] = useState<Invoice[]>([]);
   const [error, setError] = useState();

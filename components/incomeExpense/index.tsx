@@ -15,7 +15,7 @@ import { CashReceipt } from "./cash-receipt";
 
 export const IncomeExpense = () => {
   const router = useRouter();
-  const [count,setCount] = useState();
+  const [count,setCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const handleCreateCashReceiptClick = () => {
     router.push("/invoice");
@@ -72,7 +72,7 @@ export const IncomeExpense = () => {
         </div>
       </div>
       <div className="max-w-[95rem] mx-auto w-full">
-        <IncomeExpenseTableWrapper searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <IncomeExpenseTableWrapper searchQuery={searchQuery} setSearchQuery={setSearchQuery} setCount={setCount} count={count} />
       </div>
     </div>
   );

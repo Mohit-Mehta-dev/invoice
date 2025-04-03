@@ -16,6 +16,7 @@ import { AddIncomeExpense } from "../incomeExpense/add-income-expense";
 import { CashReceipt } from "../incomeExpense/cash-receipt";
 
 export const Invoices = () => {
+  const [count, setCount] = useState(0)
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -71,7 +72,7 @@ export const Invoices = () => {
         </div>
       </div>
       <div className="max-w-[95rem] mx-auto w-full">
-        <InvoiceTableWrapper searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <InvoiceTableWrapper searchQuery={searchQuery} setSearchQuery={setSearchQuery} setCount={setCount} count={count} />
       </div>
     </div>
   );

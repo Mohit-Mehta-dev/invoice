@@ -1,7 +1,7 @@
 "use client";
 import { Button, Input } from "@heroui/react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DotsIcon } from "@/components/icons/accounts/dots-icon";
 import { ExportIcon } from "@/components/icons/accounts/export-icon";
 import { InfoIcon } from "@/components/icons/accounts/info-icon";
@@ -61,7 +61,7 @@ export const Clients = () => {
         </div>
       </div>
       <div className="max-w-[95rem] mx-auto w-full">
-        <ClientTableWrapper searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <ClientTableWrapper searchQuery={searchQuery} setSearchQuery={setSearchQuery} setCount={setCount} count={count} />
       </div>
     </div>
   );

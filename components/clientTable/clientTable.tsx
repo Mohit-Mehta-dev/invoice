@@ -17,10 +17,9 @@ import { deleteClients, getClients } from "@/services/clientService";
 import { getAuthFromLocalStorage } from "@/utils/localStorageUtils";
 import { Client, User } from "@/helpers/types";
 
-export const ClientTableWrapper = ({searchQuery,setSearchQuery}) => {
+export const ClientTableWrapper = ({searchQuery,setSearchQuery, setCount,count}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [user, setUser] = useState<User | null>(null);
-  const [count, setCount] = useState<number>(0);
   const [clientList, setClientList] = useState<Client[]>([]);
   const [error, setError] = useState();
   // const [searchQuery, setSearchQuery] = useState<string>("");
@@ -35,6 +34,7 @@ export const ClientTableWrapper = ({searchQuery,setSearchQuery}) => {
   }, []);
 
   useEffect(() => {
+    console.log('cont chnage in table', count)
     if (user?.id) {
       fetchClients(user.id);
     }

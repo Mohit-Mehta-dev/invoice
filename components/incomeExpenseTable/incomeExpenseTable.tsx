@@ -351,11 +351,10 @@ import { getClients } from "@/services/clientService";
 import { RenderIncomeExpenseCell } from "./render-income-expense-cell";
 import { deleteIncomeExpense, getIncomeExpense } from "@/services/incomeExpenseService";
 
-export const IncomeExpenseTableWrapper = ({searchQuery, setSearchQuery}) => {
+export const IncomeExpenseTableWrapper = ({searchQuery, setSearchQuery, count, setCount}) => {
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [user, setUser] = useState<User | null>(null);
-  const [count, setCount] = useState<number>(0);
   const [ClientsList, setClientsList] = useState<Invoice[]>([]);
   const [invoiceList, setInvoiceList] = useState<Invoice[]>([]);
   const [incomeExpenseList, setIncomeExpenseList] = useState<IncomeExpense[]>([]);
@@ -488,7 +487,7 @@ export const IncomeExpenseTableWrapper = ({searchQuery, setSearchQuery}) => {
       let response = await getIncomeExpense(id);
       console.log("response", response);
       setIncomeExpenseList(response.reverse());
-      setFilteredIncomeExpenseList(response.reverse());  // Initialize the filtered list
+      setFilteredIncomeExpenseList(response);  // Initialize the filtered list
     } catch (err: unknown) {
       console.log("Data error:", err);
 
