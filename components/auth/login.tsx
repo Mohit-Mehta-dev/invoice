@@ -39,8 +39,8 @@ export const Login = () => {
         switch (status) {
           case 400:
             addToast({
-              title: 'Bad Request',
-              description: 'Please check your input and try again.',
+              title: err.response?.data.message,
+              // description: 'Please check your input and try again.',
               color: 'danger',
             });
             break;

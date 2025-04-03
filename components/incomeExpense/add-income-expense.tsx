@@ -204,7 +204,7 @@ export const AddIncomeExpense: React.FC<AddInvoiceProps> = ({ type }) => {
 
   // Calculate GST amount
   const calculateGstAmount = (subtotal: number) => {
-    return gstType === "percentage" ? (subtotal * (gst / 100)) : gst;
+    return gstType === "percentage" ? (subtotal * (gst / 100)).toFixed(2) : gst.toFixed(2);
   };
 
   // Calculate Discount amount
@@ -217,7 +217,7 @@ export const AddIncomeExpense: React.FC<AddInvoiceProps> = ({ type }) => {
     const subtotal = calculateSubtotal();
     const gstAmount = calculateGstAmount(subtotal);
     const discountAmount = calculateDiscountAmount(subtotal);
-    return subtotal + gstAmount - discountAmount;
+    return (Number(subtotal) + Number(gstAmount) - discountAmount).toFixed(2);
   };
 
   const handleInvoiceSubmit = useCallback(async() => {
@@ -757,7 +757,7 @@ const generatePDF = async () => {
           { 
             columns: [
               { text: ``, style: 'normal', width: '75%' },
-              calculateGstAmount(invoiceItems.reduce((total, item) => total + (item.qty ?? 0) * (item.price ?? 0), 0))!=0?{ text: `GST: ₹${calculateGstAmount(invoiceItems.reduce((total, item) => total + (item.qty ?? 0) * (item.price ?? 0), 0))}`, style: 'bold', alignment: 'left', width: '25%' }:{ text: ``, style: 'bold', alignment: 'right', width: '25%' }
+              Number(calculateGstAmount(invoiceItems.reduce((total, item) => total + (Number(item.qty) || 0) * (Number(item.price) || 0), 0))) !=0 ?{ text: `GST: ₹${calculateGstAmount(invoiceItems.reduce((total, item) => total + (item.qty ?? 0) * (item.price ?? 0), 0))}`, style: 'bold', alignment: 'left', width: '25%' }:{ text: ``, style: 'bold', alignment: 'right', width: '25%' }
             ]
           },
           { 
@@ -781,8 +781,9 @@ const generatePDF = async () => {
           { 
             columns: [
               { text: ``, style: 'normal', width: '75%' },
-              { text: `   Due: ₹${calculateGrandTotal()- paidAmount}    `, style: 'bold', alignment: 'left', width: '25%',background:'red', color:'#ffffff' }
+              { text: `   Due: ₹${Number(calculateGrandTotal())- paidAmount}    `, style: 'bold', alignment: 'left', width: '25%',background:'red', color:'#ffffff' }
             ],
+            margin:[0, 2, 0, 0]
           },
         ],
         margin: [0, 0, 0, 20],
@@ -1325,7 +1326,7 @@ const fetchIncomeExpenseByInv = useCallback(async (id: number) => {
               <div className="font-bold">Due:</div>
             </div>
             <div className="font-bold">
-              ₹{calculateGrandTotal()- paidAmount}
+              ₹{Number(calculateGrandTotal())- paidAmount}
             </div>
           </div>
         </div>

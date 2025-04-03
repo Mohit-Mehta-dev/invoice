@@ -1,251 +1,177 @@
 import {
   addToast,
-    Link,
-    Table,
-    TableBody,
-    TableCell,
-    TableColumn,
-    TableHeader,
-    TableRow,
-    useDisclosure,
-  } from "@heroui/react";
-  import React, { useCallback, useEffect, useState } from "react";
-  import { columns, invoices } from "./invoiceData";
-  import { RenderInvoiceCell } from "./render-invoice-cell";
-  import { AxiosError } from "axios";
+  Link,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  useDisclosure,
+} from "@heroui/react";
+import React, { useCallback, useEffect, useState } from "react";
+import { columns, invoices } from "./invoiceData";
+import { RenderInvoiceCell } from "./render-invoice-cell";
+import { AxiosError } from "axios";
 import { Invoice, User } from "@/helpers/types";
 import { getAuthFromLocalStorage } from "@/utils/localStorageUtils";
 import { deleteInvoice, getInvoices } from "@/services/invoiceService";
 import { getClients } from "@/services/clientService";
-  
-  export const InvoiceTableWrapper = () => {
 
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const [user, setUser] = useState<User | null>(null);
-    const [count, setCount] = useState<number>(0);
-    const [ClientsList, setClientsList] = useState<Invoice[]>([]);
-    const [invoiceList, setInvoiceList] = useState<Invoice[]>([]);
-    const [error, setError] = useState();
+export const InvoiceTableWrapper = ({searchQuery, setSearchQuery}) => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [user, setUser] = useState<User | null>(null);
+  const [count, setCount] = useState<number>(0);
+  const [ClientsList, setClientsList] = useState<Invoice[]>([]);
+  const [invoiceList, setInvoiceList] = useState<Invoice[]>([]);
+  const [error, setError] = useState();
 
-    // Pagination state
-      const [currentPage, setCurrentPage] = useState(1);
-      const itemsPerPage = 10; // Number of items per page
-      
-
-    useEffect(() => {
-      const storedUser = getAuthFromLocalStorage();
-      setUser(storedUser ? (storedUser as User) : null); // Safely set user
-    }, []);
-  
-    useEffect(() => {
-      if (user?.id) {
-        fetchClients(user.id);
-        fetchInvoices(user.id);
-      }
-    }, [user, count,onOpenChange]);  
-
-    const fetchClients = useCallback(async (id: number) => {
-        try {
-          let response = await getClients(id);
-          console.log("response", response);
-          setClientsList(response);
-        } catch (err: unknown) {
-          console.log("Login error:", err);
-    
-          if (err instanceof AxiosError) {
-            const status = err.response?.status;
-    
-            switch (status) {
-              case 400:
-                addToast({
-                  title: "Bad Request",
-                  description: "Please check your input and try again.",
-                  color: "danger",
-                });
-                break;
-              case 401:
-                addToast({
-                  title: "Unauthorized",
-                  description: "Invalid credentials. Please try again.",
-                  color: "danger",
-                });
-                break;
-              case 500:
-                addToast({
-                  title: "Server Error",
-                  description: "An error occurred on the server. Please try again later.",
-                  color: "danger",
-                });
-                break;
-              default:
-                addToast({
-                  title: "Error",
-                  description: "An unexpected error occurred. Please try again.",
-                  color: "danger",
-                });
-                break;
-            }
-          } else {
-            addToast({
-              title: "Unexpected Error",
-              description: "An unexpected error occurred. Please try again.",
-              color: "danger",
-            });
-          }
-        }
-      }, [addToast, setError]);
-    
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // Number of items per page
 
 
-    const fetchInvoices = useCallback(async (id: number) => {
-      try {
-        let response = await getInvoices(id);
-        console.log("response", response);
-        setInvoiceList(response.reverse());
-      } catch (err: unknown) {
-        console.log("Login error:", err);
-  
-        if (err instanceof AxiosError) {
-          const status = err.response?.status;
-  
-          switch (status) {
-            case 400:
-              addToast({
-                title: "Bad Request",
-                description: "Please check your input and try again.",
-                color: "danger",
-              });
-              break;
-            case 401:
-              addToast({
-                title: "Unauthorized",
-                description: "Invalid credentials. Please try again.",
-                color: "danger",
-              });
-              break;
-            case 404:
-              addToast({
-                title: "No data",
-                description: "No invoice found.",
-                color: "success",
-              });
-              break;
-            case 500:
-              addToast({
-                title: "Server Error",
-                description: "An error occurred on the server. Please try again later.",
-                color: "danger",
-              });
-              break;
-            default:
-              addToast({
-                title: "Error",
-                description: "An unexpected error occurred. Please try again.",
-                color: "danger",
-              });
-              break;
-          }
-        } else {
+  useEffect(() => {
+    const storedUser = getAuthFromLocalStorage();
+    setUser(storedUser ? (storedUser as User) : null); // Safely set user
+  }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchClients(user.id);
+      fetchInvoices(user.id);
+    }
+  }, [user, count, onOpenChange]);
+
+  const fetchClients = useCallback(async (id: number) => {
+    try {
+      let response = await getClients(id);
+      console.log("response", response);
+      setClientsList(response);
+    } catch (err: unknown) {
+      console.log("Login error:", err);
+      handleError(err);
+    }
+  }, [addToast, setError]);
+
+  const fetchInvoices = useCallback(async (id: number) => {
+    try {
+      let response = await getInvoices(id);
+      console.log("response", response);
+      setInvoiceList(response.reverse());
+    } catch (err: unknown) {
+      console.log("Login error:", err);
+      handleError(err);
+    }
+  }, [addToast, setError]);
+
+  const removeInvoice = useCallback(async (id: number) => {
+    try {
+      let response = await deleteInvoice(id);
+      console.log("response", response);
+      setCount(prev => prev + 1);
+    } catch (err: unknown) {
+      console.log("delete error:", err);
+      handleError(err);
+    }
+  }, []);
+
+  const handleError = (err: unknown) => {
+    if (err instanceof AxiosError) {
+      const status = err.response?.status;
+      switch (status) {
+        case 400:
           addToast({
-            title: "Unexpected Error",
+            title: "Bad Request",
+            description: "Please check your input and try again.",
+            color: "danger",
+          });
+          break;
+        case 401:
+          addToast({
+            title: "Unauthorized",
+            description: "Invalid credentials. Please try again.",
+            color: "danger",
+          });
+          break;
+        case 500:
+          addToast({
+            title: "Server Error",
+            description: "An error occurred on the server. Please try again later.",
+            color: "danger",
+          });
+          break;
+        default:
+          addToast({
+            title: "Error",
             description: "An unexpected error occurred. Please try again.",
             color: "danger",
           });
-        }
+          break;
       }
-    }, [addToast, setError]);
+    } else {
+      addToast({
+        title: "Unexpected Error",
+        description: "An unexpected error occurred. Please try again.",
+        color: "danger",
+      });
+    }
+  };
 
-    const removeInvoice = useCallback(async (id: number) => {
-        try {
-          let response = await deleteInvoice(id);
-          console.log("response", response);
-          setCount(prev=>prev+1)
-        } catch (err: unknown) {
-          console.log("delete error:", err);
-    
-          if (err instanceof AxiosError) {
-            const status = err.response?.status;
-    
-            switch (status) {
-              case 400:
-                addToast({
-                  title: "Bad Request",
-                  description: "Please check your input and try again.",
-                  color: "danger",
-                });
-                break;
-              case 401:
-                addToast({
-                  title: "Unauthorized",
-                  description: "Invalid credentials. Please try again.",
-                  color: "danger",
-                });
-                break;
-              case 500:
-                addToast({
-                  title: "Server Error",
-                  description: "An error occurred on the server. Please try again later.",
-                  color: "danger",
-                });
-                break;
-              default:
-                addToast({
-                  title: "Error",
-                  description: "An unexpected error occurred. Please try again.",
-                  color: "danger",
-                });
-                break;
-            }
-          } else {
-            addToast({
-              title: "Unexpected Error",
-              description: "An unexpected error occurred. Please try again.",
-              color: "danger",
-            });
-          }
-        }
-      }, []);
-      
+  // Apply search filter to invoiceList
+  const filteredInvoiceList = invoiceList.filter(invoice => {
+    return (
+      invoice?.customer?.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      invoice?.customer?.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      invoice?.inv_number?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
-    // Pagination logic
+  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = invoiceList.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredInvoiceList.slice(indexOfFirstItem, indexOfLastItem);
 
   // Handle page change
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   // Total pages
-  const totalPages = Math.ceil(invoiceList.length / itemsPerPage);
-  
-    return (
-      <div className=" w-full flex flex-col gap-4">
-        <Table aria-label="Example table with custom cells">
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn
-                key={column.uid}
-                hideHeader={column.uid === "actions"}
-                align={column.uid === "actions" ? "center" : "start"}
-              >
-                {column.name}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody items={invoiceList}>
-            {(item) => (
-              <TableRow>
-                {(columnKey) => (
-                  <TableCell>
-                    {RenderInvoiceCell({ invoice: item, columnKey: columnKey, setCount:setCount, deleteInvoice:removeInvoice })}
-                  </TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+  const totalPages = Math.ceil(filteredInvoiceList.length / itemsPerPage);
 
-        {/* Pagination controls */}
+  return (
+    <div className="w-full flex flex-col gap-4">
+
+      <Table aria-label="Example table with custom cells">
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              hideHeader={column.uid === "actions"}
+              align={column.uid === "actions" ? "center" : "start"}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={currentItems}>
+          {(item) => (
+            <TableRow key={item.id}>
+              {(columnKey) => (
+                <TableCell>
+                  {RenderInvoiceCell({
+                    invoice: item,
+                    columnKey: columnKey,
+                    setCount: setCount,
+                    deleteInvoice: removeInvoice,
+                  })}
+                </TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
+      {/* Pagination controls */}
       <div className="flex justify-center gap-4 mt-4">
         <button
           onClick={() => paginate(currentPage - 1)}
@@ -271,7 +197,6 @@ import { getClients } from "@/services/clientService";
           Next
         </button>
       </div>
-      </div>
-    );
-  };
-  
+    </div>
+  );
+};

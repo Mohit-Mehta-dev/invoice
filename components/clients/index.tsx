@@ -14,6 +14,7 @@ import { ClientTableWrapper } from "../clientTable/clientTable";
 
 export const Clients = () => {
   const [count, setCount] = useState(0)
+  const [searchQuery, setSearchQuery] = useState<string>("");
   return (
     <div className="my-10 px-4 lg:px-6 max-w-[95rem] mx-auto w-full flex flex-col gap-4">
       <ul className="flex">
@@ -43,12 +44,14 @@ export const Clients = () => {
               input: "w-full",
               mainWrapper: "w-full",
             }}
+            value={searchQuery}
+            onChange={(e)=>setSearchQuery(e.target.value)}
             placeholder="Search users"
           />
-          <SettingsIcon />
+          {/* <SettingsIcon />
           <TrashIcon />
           <InfoIcon />
-          <DotsIcon />
+          <DotsIcon /> */}
         </div>
         <div className="flex flex-row gap-3.5 flex-wrap">
           <AddClient type={'add'} setCount={setCount} />
@@ -58,7 +61,7 @@ export const Clients = () => {
         </div>
       </div>
       <div className="max-w-[95rem] mx-auto w-full">
-        <ClientTableWrapper />
+        <ClientTableWrapper searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
     </div>
   );

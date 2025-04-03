@@ -1,7 +1,7 @@
 "use client";
 import { Button, Input } from "@heroui/react";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { DotsIcon } from "@/components/icons/accounts/dots-icon";
 import { ExportIcon } from "@/components/icons/accounts/export-icon";
 import { InfoIcon } from "@/components/icons/accounts/info-icon";
@@ -17,6 +17,7 @@ import { CashReceipt } from "../incomeExpense/cash-receipt";
 
 export const Invoices = () => {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handleCreateInvoiceClick = () => {
     router.push("/invoice");
@@ -52,12 +53,14 @@ export const Invoices = () => {
               input: "w-full",
               mainWrapper: "w-full",
             }}
+            value={searchQuery}
+            onChange={(e)=>setSearchQuery(e.target.value)}
             placeholder="Search users"
           />
-          <SettingsIcon />
+          {/* <SettingsIcon />
           <TrashIcon />
           <InfoIcon />
-          <DotsIcon />
+          <DotsIcon /> */}
         </div>
         <div className="flex flex-row gap-3.5 flex-wrap">
           {/* <AddInvoice type={'add'} /> */}
@@ -68,7 +71,7 @@ export const Invoices = () => {
         </div>
       </div>
       <div className="max-w-[95rem] mx-auto w-full">
-        <InvoiceTableWrapper />
+        <InvoiceTableWrapper searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
     </div>
   );

@@ -217,10 +217,10 @@ export const CashReceipt: React.FC<AddClientProps> = ({
                         <Input
                           variant="bordered"
                           label="Amount"
-                          value={String(receiptType) === 'expense'?  values.credit_amount:values.debit_amount}
-                          isInvalid={String(receiptType) === 'expense'?  !!errors.credit_amount && !!touched.credit_amount:!!errors.debit_amount && !!touched.debit_amount}
-                          errorMessage={String(receiptType) === 'expense'?  errors.credit_amount:errors.debit_amount}
-                          onChange={String(receiptType) === 'expense'?  handleChange("credit_amount"):handleChange("debit_amount")}
+                          value={String(receiptType) === 'expense'?  values.debit_amount:values.credit_amount}
+                          isInvalid={String(receiptType) === 'expense'?  !!errors.debit_amount && !!touched.debit_amount:!!errors.credit_amount && !!touched.credit_amount}
+                          errorMessage={String(receiptType) === 'expense'?  errors.debit_amount:errors.credit_amount}
+                          onChange={String(receiptType) === 'expense'?  handleChange("debit_amount"):handleChange("credit_amount")}
                           className="mb-4"
                           readOnly={type==="view"}
                           max={50}

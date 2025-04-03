@@ -365,11 +365,12 @@ const generatePDF = async () => {
       {
         table: {
           headerRows: 1,
-          widths: ['*', '*', '*', '*'],
+          widths: ['*', '*', '*', '*','*'],
           body: [
             [
               { text: 'Payment For', style: 'tableHeader' },
               { text: 'Payment Mode', style: 'tableHeader' },
+              { text: 'Payment Type', style: 'tableHeader' },
               { text: 'Price', style: 'tableHeader' },
               { text: 'Date', style: 'tableHeader' },
             ],
@@ -377,6 +378,12 @@ const generatePDF = async () => {
               // Handle dynamic values with safe checks
               { text: type === 'view' ? ReceiptData.pay_for : { text: ReceiptData.pay_for, editable: true }, style: 'tableData' },
               { text: type === 'view' ? ReceiptData.payment_type : { text: ReceiptData.payment_type, editable: true }, style: 'tableData' },
+              { 
+                text: type === 'view' 
+                  ? (ReceiptData.credit_amount !== "0.00" && !isNaN(parseFloat(ReceiptData.credit_amount)) ? 'Income' : 'Expense') 
+                  : { text: (ReceiptData.credit_amount !== "0.00" && !isNaN(parseFloat(ReceiptData.credit_amount)) ? 'Income' : 'Expense'), editable: true }, 
+                style: 'tableData' 
+              },
               { 
                 text: type === 'view' 
                   ? (ReceiptData.credit_amount !== "0.00" && !isNaN(parseFloat(ReceiptData.credit_amount)) ? String(ReceiptData.credit_amount) : String(ReceiptData.debit_amount)) 
@@ -640,8 +647,9 @@ useEffect(() => {
           {/* <TableColumn>No</TableColumn> */}
           <TableColumn>Payment For</TableColumn>
           <TableColumn>Payment Mode</TableColumn>
+          <TableColumn>Payment Type</TableColumn>
           <TableColumn>Price</TableColumn>
-          <TableColumn>date</TableColumn>
+          <TableColumn>Date</TableColumn>
         </TableHeader>
         <TableBody>
           {/* {invoiceItems.map((item, index) => ( */}
@@ -654,6 +662,9 @@ useEffect(() => {
               </TableCell>
               <TableCell>
                 {ReceiptData?.payment_type}
+              </TableCell>
+              <TableCell>
+              {ReceiptData?.credit_amount !="0.00" ?'Income':'Expense'}
               </TableCell>
               <TableCell>
                 {ReceiptData?.credit_amount !="0.00" ?ReceiptData?.credit_amount:ReceiptData?.debit_amount}

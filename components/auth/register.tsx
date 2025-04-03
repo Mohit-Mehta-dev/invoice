@@ -49,13 +49,14 @@ export const Register = () => {
       console.log('Register error:', err);
   
       if (err instanceof AxiosError) {
+        console.log('err',err)
         const status = err.response?.status;
   
         switch (status) {
           case 400:
             addToast({
-              title: 'Bad Request',
-              description: 'Please check your input and try again.',
+              title: err.response?.data.message,
+              // description: err.response?.data.message,
               color: 'danger',
             });
             break;

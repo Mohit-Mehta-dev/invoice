@@ -16,7 +16,7 @@ import { CashReceipt } from "./cash-receipt";
 export const IncomeExpense = () => {
   const router = useRouter();
   const [count,setCount] = useState();
-
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const handleCreateCashReceiptClick = () => {
     router.push("/invoice");
   };
@@ -51,12 +51,14 @@ export const IncomeExpense = () => {
               input: "w-full",
               mainWrapper: "w-full",
             }}
+            value={searchQuery}
+            onChange={(e)=>setSearchQuery(e.target.value)}
             placeholder="Search users"
           />
-          <SettingsIcon />
+          {/* <SettingsIcon />
           <TrashIcon />
           <InfoIcon />
-          <DotsIcon />
+          <DotsIcon /> */}
         </div>
         <div className="flex flex-row gap-3.5 flex-wrap">
           {/* <AddInvoice type={'add'} /> */}
@@ -70,7 +72,7 @@ export const IncomeExpense = () => {
         </div>
       </div>
       <div className="max-w-[95rem] mx-auto w-full">
-        <IncomeExpenseTableWrapper />
+        <IncomeExpenseTableWrapper searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
     </div>
   );

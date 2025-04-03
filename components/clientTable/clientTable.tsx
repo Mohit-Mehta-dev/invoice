@@ -17,13 +17,14 @@ import { deleteClients, getClients } from "@/services/clientService";
 import { getAuthFromLocalStorage } from "@/utils/localStorageUtils";
 import { Client, User } from "@/helpers/types";
 
-export const ClientTableWrapper = () => {
+export const ClientTableWrapper = ({searchQuery,setSearchQuery}) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [user, setUser] = useState<User | null>(null);
   const [count, setCount] = useState<number>(0);
   const [clientList, setClientList] = useState<Client[]>([]);
   const [error, setError] = useState();
-  
+  // const [searchQuery, setSearchQuery] = useState<string>("");
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Number of items per page
@@ -37,7 +38,7 @@ export const ClientTableWrapper = () => {
     if (user?.id) {
       fetchClients(user.id);
     }
-  }, [user, count,onOpenChange]);
+  }, [user, count, onOpenChange]);
 
   const fetchClients = useCallback(async (id: number) => {
     try {
@@ -63,6 +64,13 @@ export const ClientTableWrapper = () => {
               title: "Unauthorized",
               description: "Invalid credentials. Please try again.",
               color: "danger",
+            });
+            break;
+          case 404:
+            addToast({
+              title: "No data",
+              description: "No Customers found.",
+              color: "success",
             });
             break;
           case 500:
@@ -94,7 +102,7 @@ export const ClientTableWrapper = () => {
     try {
       let response = await deleteClients(id);
       console.log("response", response);
-      setCount(prev=>prev+1)
+      setCount(prev => prev + 1);
     } catch (err: unknown) {
       console.log("delete error:", err);
 
@@ -140,21 +148,36 @@ export const ClientTableWrapper = () => {
       }
     }
   }, []);
-  
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = clientList.slice(indexOfFirstItem, indexOfLastItem);
+  
+  // Filter clients based on search query
+  const filteredClients = clientList.filter(client => {
+    return (
+      client.company_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      client.first_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      client.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
+
+  const currentItems = filteredClients.slice(indexOfFirstItem, indexOfLastItem);
 
   // Handle page change
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   // Total pages
-  const totalPages = Math.ceil(clientList.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset to first page when search query changes
+  };
 
   return (
     <div className="w-full flex flex-col gap-4">
+
       <Table aria-label="Example table with custom cells">
         <TableHeader columns={columns}>
           {(column) => (
@@ -172,7 +195,12 @@ export const ClientTableWrapper = () => {
             <TableRow>
               {(columnKey) => (
                 <TableCell>
-                  {RenderClientCell({ client: item, columnKey: columnKey, setCount:setCount, deleteClient:deleteClient })}
+                  {RenderClientCell({
+                    client: item,
+                    columnKey: columnKey,
+                    setCount: setCount,
+                    deleteClient: deleteClient,
+                  })}
                 </TableCell>
               )}
             </TableRow>

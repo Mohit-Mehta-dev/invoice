@@ -237,6 +237,7 @@ export type IncomeExpense = {
   pay_for: string;
   email: string;
   phone: string;
+  first_name: string;
   company_name: string;
   address_line1: string;
   address_line2: string;
