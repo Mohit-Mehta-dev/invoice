@@ -1042,13 +1042,13 @@ const fetchIncomeExpenseByInv = useCallback(async (id: number) => {
   return (
     <div className="mt-4">
       <div className="fixed bottom-20 right-10 z-50 rounded-xl">
-        <Button onPress={generatePDF} color="primary" className="mb-4 rounded-xl">
+        <Button onPress={generatePDF} color="primary" className="mb-8 rounded-xl">
           PDF
         </Button>
       </div>
       {type === "add"&&<div className="fixed bottom-10 right-10 z-50 rounded-xl">
         <Button onPress={handleInvoiceSubmit} color="primary" className="mb-4 rounded-xl">
-          <AccountsIcon  />
+          Save
         </Button>
       </div>}
       {type === "update"&&<div className="fixed bottom-10 right-10 z-50 rounded-xl">
@@ -1442,7 +1442,7 @@ const fetchIncomeExpenseByInv = useCallback(async (id: number) => {
           value={moment(paymentDate).format('YYYY-MM-DD')}  // Format as string 'YYYY-MM-DD'
           onChange={(e) => setPaymentDate(moment(e.target.value).toISOString())}
         />
-        {selectedPaymentItem ?<Button onPress={handlePaymentSubmit} ><EditIcon /></Button>:<Button onPress={handlePaymentSubmit} ><HomeIcon /></Button>}
+        {selectedPaymentItem ?<Button onPress={handlePaymentSubmit} >Update</Button>:<Button onPress={handlePaymentSubmit} >Add</Button>}
       </div>
 
       

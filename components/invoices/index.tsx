@@ -62,9 +62,9 @@ export const Invoices = () => {
         <div className="flex flex-row gap-3.5 flex-wrap">
           {/* <AddInvoice type={'add'} /> */}
           {/* <CashReceipt type={'add'} /> */}
-          <Button color="primary" startContent={<ExportIcon />}>
+          {/* <Button color="primary" startContent={<ExportIcon />}>
             Export to CSV
-          </Button>
+          </Button> */}
         </div>
       </div>
       <div className="max-w-[95rem] mx-auto w-full">

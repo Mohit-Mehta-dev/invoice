@@ -570,7 +570,7 @@ useEffect(() => {
               </div>
             </div> */}
             <h1 className="text-xl font-bold" style={{ color: userSettings?.inv_secondary_color }}>
-              Date: {moment(ReceiptData.payment_date).format('DD-MM-YYYY')}
+              Date: {moment(ReceiptData?.payment_date).format('DD-MM-YYYY')}
             </h1>
           </div>
         </div>
@@ -650,16 +650,16 @@ useEffect(() => {
                 {index+1}
               </TableCell> */}
               <TableCell>
-                {ReceiptData.pay_for}
+                {ReceiptData?.pay_for}
               </TableCell>
               <TableCell>
-                {ReceiptData.payment_type}
+                {ReceiptData?.payment_type}
               </TableCell>
               <TableCell>
-                {ReceiptData.credit_amount !="0.00" ?ReceiptData.credit_amount:ReceiptData.debit_amount}
+                {ReceiptData?.credit_amount !="0.00" ?ReceiptData?.credit_amount:ReceiptData?.debit_amount}
               </TableCell>
               <TableCell>
-                {moment(ReceiptData.payment_date).format('DD-MM-YYYY')}
+                {moment(ReceiptData?.payment_date).format('DD-MM-YYYY')}
               </TableCell>
             </TableRow>
           {/* ))} */}
